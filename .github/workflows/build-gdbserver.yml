@@ -24,20 +24,19 @@ jobs:
 
     - name: Configure and build for MIPS64 big-endian
       run: |
-        cd gdb-14.1
-        mkdir -p build
-        cd build
-        ../configure --target=mips64-linux-gnu --disable-werror --disable-gdbmi --disable-tui LDFLAGS="-static" CFLAGS="-O2 -static"
-        make -j$(nproc) all-gdbserver 2>&1 | tail -50
+        cd gdb-14.1/gdb/gdbserver
+        ./configure --target=mips64-linux-gnu --disable-werror LDFLAGS="-static" CFLAGS="-O2 -static"
+        make -j$(nproc) 2>&1 | tail -100
 
     - name: Verify binary
       run: |
-        file gdb-14.1/build/gdb/gdbserver/gdbserver
-        readelf -h gdb-14.1/build/gdb/gdbserver/gdbserver | grep -E "Machine|Data"
+        ls -la gdb-14.1/gdb/gdbserver/
+        file gdb-14.1/gdb/gdbserver/gdbserver
+        readelf -h gdb-14.1/gdb/gdbserver/gdbserver | grep -E "Machine|Data"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: gdbserver-mips64-be
-        path: gdb-14.1/build/gdb/gdbserver/gdbserver
+        path: gdb-14.1/gdb/gdbserver/gdbserver
         retention-days: 30
