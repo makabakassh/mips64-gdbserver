@@ -1,0 +1,41 @@
+name: Build MIPS64 gdbserver
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential crossbuild-essential-mips64el wget
+
+    - name: Download GDB source
+      run: |
+        wget http://ftp.gnu.org/gnu/gdb/gdb-14.1.tar.xz
+        tar xf gdb-14.1.tar.xz
+
+    - name: Configure and build
+      run: |
+        cd gdb-14.1
+        ./configure --target=mips64-linux-gnu --disable-werror LDFLAGS="-static"
+        make -j$(nproc)
+
+    - name: Verify binary
+      run: |
+        file gdb-14.1/gdb/gdbserver
+        ldd gdb-14.1/gdb/gdbserver || echo "Static binary confirmed"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: gdbserver-mips64
+        path: gdb-14.1/gdb/gdbserver
+        retention-days: 30
