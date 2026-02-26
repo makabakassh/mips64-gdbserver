@@ -26,7 +26,7 @@ jobs:
       run: |
         cd gdb-14.1
         ./configure --target=mips64-linux-gnu --disable-werror --disable-gdbmi --disable-tui LDFLAGS="-static" CFLAGS="-O2 -static"
-        make -j$(nproc) all-gdbserver
+        make -j$(nproc)
 
     - name: Verify binary
       run: |
