@@ -1,4 +1,4 @@
-name: Build MIPS64 gdbserver
+name: Build MIPS64 Big-Endian gdbserver
 
 on:
   push:
@@ -15,27 +15,27 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential crossbuild-essential-mips64el wget
+        sudo apt-get install -y build-essential crossbuild-essential-mips64 wget
 
     - name: Download GDB source
       run: |
         wget http://ftp.gnu.org/gnu/gdb/gdb-14.1.tar.xz
         tar xf gdb-14.1.tar.xz
 
-    - name: Configure and build
+    - name: Configure and build for MIPS64 big-endian
       run: |
         cd gdb-14.1
-        ./configure --target=mips64-linux-gnu --disable-werror LDFLAGS="-static"
-        make -j$(nproc)
+        ./configure --target=mips64-linux-gnu --disable-werror --disable-gdbmi --disable-tui LDFLAGS="-static" CFLAGS="-O2 -static"
+        make -j$(nproc) all-gdbserver
 
     - name: Verify binary
       run: |
         file gdb-14.1/gdb/gdbserver
-        ldd gdb-14.1/gdb/gdbserver || echo "Static binary confirmed"
+        readelf -h gdb-14.1/gdb/gdbserver | grep -E "Machine|Data"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: gdbserver-mips64
+        name: gdbserver-mips64-be
         path: gdb-14.1/gdb/gdbserver
         retention-days: 30
