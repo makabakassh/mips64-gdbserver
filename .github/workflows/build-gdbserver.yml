@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
@@ -34,7 +34,7 @@ jobs:
         readelf -h gdb-14.1/gdb/gdbserver | grep -E "Machine|Data"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: gdbserver-mips64-be
         path: gdb-14.1/gdb/gdbserver
